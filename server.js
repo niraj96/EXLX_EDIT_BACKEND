@@ -21,8 +21,15 @@ app.use(formidabe({
 
 app.post('/json', (req, res)=>{
 
-    let fileArr = req.files.excels;
     let jsonArr = [];
+
+    let fileArr = [];
+    let removeFile = [];
+    if(req.files.excels.length == undefined){
+        fileArr.push(req.files.excels);
+    }else{
+        fileArr = req.files.excels;
+    }
 
     for(let i=0; i<fileArr.length; i++){
 
@@ -32,10 +39,15 @@ app.post('/json', (req, res)=>{
             source: fs.readFileSync(file.path)
         });
 
-        fs.unlinkSync(file.path);
+        console.log(file.path);
+        removeFile.push(file.path);
         jsonArr.push({name:file.name, data:result});
 
     }
+
+    removeFile.forEach(path=>{
+        fs.unlinkSync(path);
+    })
   
     res.send(jsonArr);
 
